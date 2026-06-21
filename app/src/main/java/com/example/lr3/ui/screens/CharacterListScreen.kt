@@ -228,7 +228,7 @@ fun CharacterCard(
                 Text("${character.species} · ${character.status}")
                 if (character.locationName.isNotBlank()) {
                     Text(
-                        "📍 ${character.locationName}",
+                        "${character.locationName}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
