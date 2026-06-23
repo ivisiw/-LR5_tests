@@ -66,6 +66,35 @@ class CharacterRepositoryIntegrationTest {
     }
 
     @Test
+    fun `searchCharacters marks characters as favourite based on real Room data`() = runTest {
+        val rickEntity = com.example.lr3.data.local.FavouriteEntity(
+            id = 1, name = "Rick Sanchez", status = "Alive", species = "Human",
+            type = "", gender = "Male", originName = "Earth", locationName = "Earth",
+            episodeCount = 10, created = "2017-11-04"
+        )
+        db.favouriteDao().insert(rickEntity)
+
+        val rickDto = com.example.lr3.data.remote.CharacterDto(
+            id = 1, name = "Rick Sanchez", status = "Alive", species = "Human",
+            type = "", gender = "Male",
+            origin = com.example.lr3.data.remote.LocationDto("Earth"),
+            location = com.example.lr3.data.remote.LocationDto("Earth"),
+            episode = listOf("ep1"),
+            created = "2017-11-04T18:48:46.250Z"
+        )
+        io.mockk.coEvery { api.getCharacters(any(), any(), any()) } returns
+                com.example.lr3.data.remote.CharacterResponse(
+                    info = com.example.lr3.data.remote.PageInfo(next = null),
+                    results = listOf(rickDto)
+                )
+
+        val result = repository.searchCharacters("", 1, "")
+
+        assertEquals(1, result.characters.size)
+        assertTrue(result.characters[0].isFavourite)
+    }
+
+    @Test
     fun `removeFavourite actually deletes from real Room database`() = runTest {
         repository.addFavourite(rick)
         assertTrue(repository.isFavourite(1))

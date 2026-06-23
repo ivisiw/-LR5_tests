@@ -60,6 +60,7 @@ class CharacterViewModel @Inject constructor(
     private var loadState = ListLoadState()
     private var loadJob: Job? = null
     private var detailRequestId = 0
+    private var isLoadingMore = false
 
     init {
         loadInitial()
@@ -87,7 +88,7 @@ class CharacterViewModel @Inject constructor(
     }
 
     fun loadNextPage() {
-        if (loadState.endReached) return
+        if (loadState.endReached || isLoadingMore) return
         startLoad(loadMore = true)
     }
 
@@ -98,6 +99,8 @@ class CharacterViewModel @Inject constructor(
     private fun startLoad(loadMore: Boolean) {
         if (!loadMore) {
             loadJob?.cancel()
+        } else {
+            isLoadingMore = true
         }
         loadJob = viewModelScope.launch {
             if (!loadMore) {
@@ -148,6 +151,8 @@ class CharacterViewModel @Inject constructor(
                         paginationError = true
                     )
                 }
+            } finally {
+                if (loadMore) isLoadingMore = false
             }
         }
     }
@@ -206,7 +211,7 @@ class CharacterViewModel @Inject constructor(
 
                 loadFavourites()
             } catch (e: Exception) {
-                e.printStackTrace()
+                favouritesError = "Не удалось обновить избранное"
             }
         }
     }

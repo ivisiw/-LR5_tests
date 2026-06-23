@@ -1,5 +1,7 @@
 package com.example.lr3.ui.screens
 
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -46,7 +48,7 @@ class CharacterListScreenTest {
 
         composeRule.onNodeWithText("Morty Smith").performClick()
 
-        assert(clickedId == 2) { "Ожидался клик по id=2 (Morty), получено: $clickedId" }
+        assertEquals(2, clickedId)
     }
 
     @Test
@@ -71,6 +73,6 @@ class CharacterListScreenTest {
 
         composeRule.onNodeWithText("Повторить").performClick()
 
-        assert(retried) { "onRetry не был вызван после клика на кнопку" }
+        assertTrue(retried)
     }
 }

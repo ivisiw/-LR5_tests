@@ -55,6 +55,21 @@ class CharacterViewModelTest {
     }
 
     @Test
+    fun `initial state is Loading before data arrives`() = runTest {
+        coEvery { repository.searchCharacters("", 1, "") } coAnswers {
+            delay(100)
+            CharactersResult(listOf(rick, morty), hasNextPage = false)
+        }
+
+        viewModel = CharacterViewModel(repository)
+
+        assertTrue(viewModel.uiState is CharacterUiState.Loading)
+
+        advanceUntilIdle()
+        assertTrue(viewModel.uiState is CharacterUiState.Success)
+    }
+
+    @Test
     fun `successful search updates state with characters`() = runTest {
         coEvery { repository.searchCharacters("", 1, "") } returns
                 CharactersResult(emptyList(), hasNextPage = false)
@@ -98,7 +113,7 @@ class CharacterViewModelTest {
         advanceUntilIdle()
 
         assertTrue(viewModel.uiState is CharacterUiState.Success)
-        coVerify(atLeast = 2) { repository.searchCharacters("", 1, "") }
+        coVerify(exactly = 2) { repository.searchCharacters("", 1, "") }
     }
     @Test
     fun `empty search result produces Empty state, not Success with empty list`() = runTest {
